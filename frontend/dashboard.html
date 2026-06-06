@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard CampusGear</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins', sans-serif;
+    }
+
+    body{
+      background:#020617;
+      color:white;
+      min-height:100vh;
+    }
+
+    .navbar{
+      width:100%;
+      padding:20px 8%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#0f172a;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+
+    .logo{
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .logo span{
+      color:#3b82f6;
+    }
+
+    .navbar-right{
+      display:flex;
+      align-items:center;
+      gap:15px;
+    }
+
+    .user-name{
+      color:#cbd5e1;
+    }
+
+    .admin-btn{
+      padding:12px 20px;
+      border:none;
+      border-radius:10px;
+      background:#22c55e;
+      color:white;
+      cursor:pointer;
+    }
+
+    .logout-btn{
+      padding:12px 20px;
+      border:none;
+      border-radius:10px;
+      background:#ef4444;
+      color:white;
+      cursor:pointer;
+    }
+
+    .container{
+      padding:40px 8%;
+    }
+
+    .title{
+      margin-bottom:30px;
+    }
+
+    .title h1{
+      font-size:40px;
+      margin-bottom:10px;
+    }
+
+    .title p{
+      color:#cbd5e1;
+    }
+
+    .barang-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:25px;
+    }
+
+    .barang-card{
+      background:#0f172a;
+      padding:25px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.08);
+      transition:0.3s;
+    }
+
+    .barang-card:hover{
+      transform:translateY(-5px);
+      border-color:#3b82f6;
+    }
+
+    .barang-card h2{
+      margin-bottom:15px;
+    }
+
+    .barang-card p{
+      color:#cbd5e1;
+      margin-bottom:10px;
+    }
+
+    .pinjam-btn{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      color:white;
+      cursor:pointer;
+      margin-top:15px;
+    }
+
+    .pinjam-btn:disabled{
+      background:#475569;
+      cursor:not-allowed;
+    }
+
+    .modal{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.7);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:999;
+    }
+
+    .modal-content{
+      background:#0f172a;
+      padding:30px;
+      border-radius:20px;
+      width:350px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal-content h2{
+      margin-bottom:20px;
+    }
+
+    .modal-content input{
+      width:100%;
+      padding:12px;
+      margin-bottom:15px;
+      border:none;
+      border-radius:10px;
+      background:#1e293b;
+      color:white;
+    }
+
+    .modal-content button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      margin-top:10px;
+      cursor:pointer;
+    }
+
+    .close-btn{
+      background:#ef4444;
+      color:white;
+    }
+
+    .status{
+      padding:6px 12px;
+      border-radius:20px;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    /* DASHBOARD */
+
+.dashboard{
+  padding:40px 8%;
+}
+
+.welcome-card{
+  background:#0f172a;
+  padding:30px;
+  border-radius:20px;
+  margin-bottom:30px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.welcome-card h1{
+  font-size:48px;
+  margin-bottom:10px;
+}
+
+.welcome-card p{
+  color:#cbd5e1;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:25px;
+  margin-bottom:30px;
+}
+
+.dashboard-card{
+  background:#0f172a;
+  padding:25px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.08);
+  transition:.3s;
+}
+
+.dashboard-card:hover{
+  transform:translateY(-5px);
+  border-color:#3b82f6;
+}
+
+.card-icon{
+  font-size:40px;
+  margin-bottom:15px;
+}
+
+.dashboard-btn{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 20px;
+  text-decoration:none;
+  color:white;
+  border-radius:10px;
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.stat-card{
+  background:#0f172a;
+  padding:25px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.08);
+  text-align:center;
+}
+
+.stat-card h2{
+  font-size:42px;
+  color:#3b82f6;
+}
+
+    .pending{
+      background:#f59e0b;
+      color:white;
+    }
+
+    .disetujui{
+      background:#22c55e;
+      color:white;
+    }
+
+    .dikembalikan{
+      background:#3b82f6;
+      color:white;
+    }
+
+    .ditolak{
+      background:#ef4444;
+      color:white;
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <nav class="navbar">
+
+    <div class="logo">
+      Campus<span>Gear</span>
+    </div>
+
+    <div class="navbar-right">
+
+      <span class="user-name" id="user-name">
+        User
+      </span>
+
+      <button
+        class="admin-btn"
+        id="admin-btn"
+        style="display:none;"
+        onclick="goAdmin()"
+      >
+        Admin Panel
+      </button>
+
+      <button class="logout-btn" onclick="logout()">
+        Logout
+      </button>
+
+    </div>
+
+  </nav>
+
+ <section class="dashboard">
+
+    <div class="welcome-card">
+        <h1>Selamat Datang Jihan Salsabila</h1>
+        <p>Sistem Peminjaman Inventaris Kampus</p>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+            <div class="card-icon">📦</div>
+            <h2>Daftar Inventaris</h2>
+            <p>Lihat seluruh barang yang tersedia untuk dipinjam.</p>
+            <a href="inventaris.html" class="dashboard-btn">
+    Lihat Inventaris
+</a>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">📝</div>
+            <h2>Ajukan Peminjaman</h2>
+            <p>Ajukan peminjaman barang kampus secara online.</p>
+            <a href="peminjaman.html" class="dashboard-btn">
+                Ajukan
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">📋</div>
+            <h2>Riwayat Peminjaman</h2>
+            <p>Lihat status dan histori peminjaman barang.</p>
+            <a href="history.html" class="dashboard-btn">
+                Lihat Riwayat
+            </a>
+        </div>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h2>6</h2>
+            <span>Barang Tersedia</span>
+        </div>
+
+        <div class="stat-card">
+            <h2>1</h2>
+            <span>Peminjaman Aktif</span>
+        </div>
+
+        <div class="stat-card">
+            <h2>0</h2>
+            <span>Menunggu Persetujuan</span>
+        </div>
+
+    </div>
+
+</section>
+
+  <!-- MODAL -->
+
+  <div class="modal" id="modal">
+
+    <div class="modal-content">
+
+      <h2>Pinjam Barang</h2>
+
+      <input type="date" id="tanggal_pinjam">
+
+      <input type="date" id="tanggal_kembali">
+
+      <button onclick="submitPeminjaman()">
+        Submit
+      </button>
+
+      <button onclick="closeModal()" class="close-btn">
+        Batal
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    /* =========================
+       CEK LOGIN
+    ========================= */
+
+    const user = JSON.parse(
+      localStorage.getItem('user')
+    );
+
+    if(!user){
+
+      alert('Silakan login terlebih dahulu');
+
+      window.location.href = 'index.html';
+
+    }
+
+    document.getElementById('user-name')
+    .innerHTML =
+      user.nama +
+      ' (' +
+      user.nomor_identitas +
+      ')';
+
+    if(
+      user.role === 'admin' ||
+      user.role === 'dosen'
+    ){
+
+      document.getElementById('admin-btn')
+      .style.display = 'block';
+
+    }
+
+    /* =========================
+       LOAD BARANG
+    ========================= */
+
+    async function loadBarang(){
+
+      try{
+
+        const response = await fetch(
+          'http://localhost:3000/barang'
+        );
+
+        const data = await response.json();
+
+        const list = document.getElementById('barang-list');
+
+        list.innerHTML = '';
+
+        data.forEach(barang => {
+
+          list.innerHTML += `
+          
+            <div class="barang-card">
+
+              <h2>${barang.nama_barang}</h2>
+
+              <p>📦 Stok : ${barang.stok}</p>
+
+              <p>🛠 Kondisi : ${barang.kondisi_barang}</p>
+
+              <button
+                class="pinjam-btn"
+                onclick="openModal(${barang.id_barang})"
+                ${barang.stok <= 0 ? 'disabled' : ''}
+              >
+                ${
+                  barang.stok <= 0
+                  ? 'Stok Habis'
+                  : 'Pinjam Barang'
+                }
+              </button>
+
+            </div>
+
+          `;
+
+        });
+
+      }catch(error){
+
+        console.log(error);
+
+        //alert('Gagal mengambil data barang');
+
+      }
+
+    }
+
+    /* =========================
+       HISTORY PEMINJAMAN
+    ========================= */
+
+    async function loadHistory(){
+
+      try{
+
+        const response = await fetch(
+          'http://localhost:3000/peminjaman'
+        );
+
+        const data = await response.json();
+
+        const history =
+          document.getElementById('history-list');
+
+        history.innerHTML = '';
+
+        const userHistory = data.filter(
+          item => item.id_user == user.id
+        );
+
+        if(userHistory.length === 0){
+
+          history.innerHTML = `
+            <div class="barang-card">
+              <h2>Belum ada peminjaman</h2>
+              <p>
+                Kamu belum pernah melakukan peminjaman barang.
+              </p>
+            </div>
+          `;
+
+          return;
+
+        }
+
+        userHistory.forEach(item => {
+
+          history.innerHTML += `
+          
+          <div class="barang-card">
+
+            <h2>${item.nama_barang}</h2>
+
+            <p>
+              📅 Pinjam :
+              ${item.tanggal_pinjam.split('T')[0]}
+            </p>
+
+            <p>
+              📅 Kembali :
+              ${item.tanggal_kembali.split('T')[0]}
+            </p>
+
+            <p>
+              📌 Status :
+              <span class="status ${item.status}">
+                ${item.status}
+              </span>
+            </p>
+
+          </div>
+
+          `;
+
+        });
+
+      }catch(error){
+
+        console.log(error);
+
+      }
+
+    }
+
+    /* =========================
+       LOGOUT
+    ========================= */
+
+    function logout(){
+
+      localStorage.removeItem('token');
+
+      localStorage.removeItem('user');
+
+      window.location.href = 'index.html';
+
+    }
+
+    /* =========================
+       ADMIN PANEL
+    ========================= */
+
+    function goAdmin(){
+
+      window.location.href = 'admin.html';
+
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    let selectedBarang = null;
+
+    function openModal(id){
+
+      selectedBarang = id;
+
+      document.getElementById('modal')
+      .style.display = 'flex';
+
+    }
+
+    function closeModal(){
+
+      document.getElementById('modal')
+      .style.display = 'none';
+
+    }
+
+    /* =========================
+       SUBMIT PEMINJAMAN
+    ========================= */
+
+    async function submitPeminjaman(){
+
+      const tanggal_pinjam =
+        document.getElementById('tanggal_pinjam').value;
+
+      const tanggal_kembali =
+        document.getElementById('tanggal_kembali').value;
+
+      if(
+        tanggal_pinjam === '' ||
+        tanggal_kembali === ''
+      ){
+
+        alert('Isi tanggal peminjaman');
+
+        return;
+
+      }
+
+      try{
+
+        const response = await fetch(
+          'http://localhost:3000/peminjaman/tambah',
+          {
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'Authorization':
+                'Bearer ' +
+                localStorage.getItem('token')
+            },
+            body:JSON.stringify({
+              id_user:user.id,
+              id_barang:selectedBarang,
+              tanggal_pinjam,
+              tanggal_kembali
+            })
+          }
+        );
+
+        const result = await response.json();
+
+        alert(result.message);
+
+        closeModal();
+
+        loadBarang();
+        loadHistory();
+
+      }catch(error){
+
+        console.log(error);
+
+        alert('Gagal melakukan peminjaman');
+
+      }
+
+    }
+
+    //loadBarang();
+    //loadHistory();
+
+  </script>
+
+</body>
+</html>

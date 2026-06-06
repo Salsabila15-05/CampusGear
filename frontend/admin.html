@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Panel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:#020617;
+  color:white;
+}
+
+.navbar{
+  width:100%;
+  padding:20px 8%;
+  background:#0f172a;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.logo{
+  font-size:28px;
+  font-weight:700;
+}
+
+.logo span{
+  color:#3b82f6;
+}
+
+.admin-info{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.admin-name{
+  color:#cbd5e1;
+}
+
+.logout-btn{
+  padding:10px 18px;
+  border:none;
+  border-radius:10px;
+  background:#ef4444;
+  color:white;
+  cursor:pointer;
+}
+
+.container{
+  padding:40px 8%;
+}
+
+.title{
+  margin-bottom:30px;
+}
+
+.title h1{
+  font-size:40px;
+}
+
+.title p{
+  color:#cbd5e1;
+  margin-top:5px;
+}
+
+.table-container{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#0f172a;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+th{
+  background:#1e293b;
+  padding:18px;
+  text-align:left;
+}
+
+td{
+  padding:18px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+.status{
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.pending{
+  background:#f59e0b;
+  color:white;
+}
+
+.disetujui{
+  background:#22c55e;
+  color:white;
+}
+
+.dikembalikan{
+  background:#3b82f6;
+  color:white;
+}
+
+.ditolak{
+  background:#ef4444;
+  color:white;
+}
+
+.action-btn{
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  color:white;
+  margin-right:10px;
+  margin-top:5px;
+}
+
+.approve-btn{
+  background:#22c55e;
+}
+
+.return-btn{
+  background:#3b82f6;
+}
+
+.reject-btn{
+  background:#ef4444;
+}
+
+.info-box{
+  background:#0f172a;
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:30px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.info-box p{
+  color:#cbd5e1;
+  margin-top:8px;
+}
+
+.empty-text{
+  text-align:center;
+  padding:30px;
+  color:#94a3b8;
+}
+
+</style>
+
+</head>
+<body>
+
+<nav class="navbar">
+
+<div class="logo">
+Campus<span>Gear</span>
+</div>
+
+<div class="admin-info">
+
+<span class="admin-name" id="admin-name">
+Admin
+</span>
+
+<button class="logout-btn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</nav>
+
+<div class="container">
+
+<div class="info-box">
+
+<h2>Panel Persetujuan Peminjaman</h2>
+
+<p>
+Admin / Dosen dapat menyetujui, menolak,
+dan mengembalikan barang kampus.
+</p>
+
+</div>
+
+<div class="title">
+<h1>Admin Panel</h1>
+<p>Kelola peminjaman barang kampus</p>
+</div>
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+<th>Nama</th>
+<th>NPM / NIDN</th>
+<th>Barang</th>
+<th>Tanggal Pinjam</th>
+<th>Tanggal Kembali</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="peminjaman-list">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   AMBIL TOKEN
+========================= */
+
+const token = localStorage.getItem('token');
+
+/* =========================
+   PROTEKSI LOGIN
+========================= */
+
+const user = JSON.parse(
+  localStorage.getItem('user')
+);
+
+if(!user || !token){
+
+  alert('Silakan login terlebih dahulu');
+
+  window.location.href = 'index.html';
+
+}
+
+/* =========================
+   HANYA ADMIN & DOSEN
+========================= */
+
+if(
+  user.role !== 'admin' &&
+  user.role !== 'dosen'
+){
+
+  alert('Akses ditolak');
+
+  window.location.href = 'dashboard.html';
+
+}
+
+document.getElementById('admin-name')
+.innerHTML = user.nama;
+
+/* =========================
+   LOAD DATA PEMINJAMAN
+========================= */
+
+async function loadPeminjaman(){
+
+  try{
+
+    const response = await fetch(
+      'http://localhost:3000/peminjaman',
+      {
+        headers:{
+          'Authorization':'Bearer ' + token
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    const list =
+      document.getElementById('peminjaman-list');
+
+    list.innerHTML = '';
+
+    if(data.length === 0){
+
+      list.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-text">
+            Belum ada data peminjaman
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+    data.forEach(item => {
+
+      list.innerHTML += `
+      
+      <tr>
+
+        <td>${item.nama}</td>
+
+        <td>${item.nomor_identitas}</td>
+
+        <td>${item.nama_barang}</td>
+
+        <td>${item.tanggal_pinjam.split('T')[0]}</td>
+
+        <td>${item.tanggal_kembali.split('T')[0]}</td>
+
+        <td>
+          <span class="status ${item.status}">
+            ${item.status}
+          </span>
+        </td>
+
+        <td>
+
+          ${
+            item.status === 'pending'
+            ?
+            `
+            <button
+              class="action-btn approve-btn"
+              onclick="setujui(${item.id_peminjaman})"
+            >
+              Setujui
+            </button>
+
+            <button
+              class="action-btn reject-btn"
+              onclick="tolak(${item.id_peminjaman})"
+            >
+              Tolak
+            </button>
+            `
+            :
+            ''
+          }
+
+          ${
+            item.status === 'disetujui'
+            ?
+            `
+            <button
+              class="action-btn return-btn"
+              onclick="kembalikan(${item.id_peminjaman})"
+            >
+              Kembalikan
+            </button>
+            `
+            :
+            ''
+          }
+
+        </td>
+
+      </tr>
+
+      `;
+
+    });
+
+  }catch(error){
+
+    console.log(error);
+
+    alert('Gagal mengambil data');
+
+  }
+
+}
+
+/* =========================
+   SETUJUI
+========================= */
+
+async function setujui(id){
+
+  try{
+
+    const response = await fetch(
+      `http://localhost:3000/peminjaman/setujui/${id}`,
+      {
+        method:'PUT',
+        headers:{
+          'Authorization':'Bearer ' + token
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
+
+    loadPeminjaman();
+
+  }catch(error){
+
+    console.log(error);
+
+    alert('Gagal menyetujui');
+
+  }
+
+}
+
+/* =========================
+   TOLAK
+========================= */
+
+async function tolak(id){
+
+  try{
+
+    const response = await fetch(
+      `http://localhost:3000/peminjaman/tolak/${id}`,
+      {
+        method:'PUT',
+        headers:{
+          'Authorization':'Bearer ' + token
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
+
+    loadPeminjaman();
+
+  }catch(error){
+
+    console.log(error);
+
+    alert('Gagal menolak peminjaman');
+
+  }
+
+}
+
+/* =========================
+   KEMBALIKAN
+========================= */
+
+async function kembalikan(id){
+
+  try{
+
+    const response = await fetch(
+      `http://localhost:3000/peminjaman/kembalikan/${id}`,
+      {
+        method:'PUT',
+        headers:{
+          'Authorization':'Bearer ' + token
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    alert(result.message);
+
+    loadPeminjaman();
+
+  }catch(error){
+
+    console.log(error);
+
+    alert('Gagal mengembalikan barang');
+
+  }
+
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout(){
+
+  localStorage.removeItem('token');
+
+  localStorage.removeItem('user');
+
+  window.location.href = 'index.html';
+
+}
+
+/* =========================
+   LOAD AWAL
+========================= */
+
+loadPeminjaman();
+
+</script>
+
+</body>
+</html>
