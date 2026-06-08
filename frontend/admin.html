@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - CampusGear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="js/api-helper.js"></script>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+body{ background:#020617; color:white; }
+.navbar{ width:100%; padding:20px 8%; background:#0f172a; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); }
+.logo{ font-size:28px; font-weight:700; }
+.logo span{ color:#3b82f6; }
+.admin-info{ display:flex; align-items:center; gap:15px; }
+.admin-name{ color:#cbd5e1; }
+.btn{ padding:10px 18px; border:none; border-radius:10px; cursor:pointer; color:white; font-family:'Poppins',sans-serif; }
+.back-btn{ background:#3b82f6; }
+.logout-btn{ background:#ef4444; }
+.container{ padding:40px 8%; }
+.info-box{ background:#0f172a; padding:20px; border-radius:16px; margin-bottom:30px; border:1px solid rgba(255,255,255,0.08); }
+.info-box p{ color:#cbd5e1; margin-top:8px; }
+.title{ margin-bottom:20px; }
+.title h1{ font-size:40px; }
+.title p{ color:#cbd5e1; margin-top:5px; }
+.filter-bar{ display:flex; gap:10px; margin-bottom:25px; flex-wrap:wrap; }
+.filter-btn{ padding:10px 20px; border:1px solid rgba(255,255,255,0.15); border-radius:10px; background:transparent; color:#cbd5e1; cursor:pointer; font-family:'Poppins',sans-serif; transition:.2s; }
+.filter-btn.active{ background:#2563eb; border-color:#2563eb; color:white; }
+.table-container{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; background:#0f172a; border-radius:20px; overflow:hidden; }
+th{ background:#1e293b; padding:18px; text-align:left; white-space:nowrap; }
+td{ padding:18px; border-top:1px solid rgba(255,255,255,0.08); }
+.status{ padding:8px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+.menunggu{ background:#f59e0b; color:white; }
+.disetujui{ background:#22c55e; color:white; }
+.dikembalikan{ background:#3b82f6; color:white; }
+.ditolak{ background:#ef4444; color:white; }
+.action-btn{ padding:10px 15px; border:none; border-radius:10px; cursor:pointer; color:white; margin-right:8px; margin-top:5px; font-family:'Poppins',sans-serif; white-space:nowrap; }
+.approve-btn{ background:#22c55e; }
+.return-btn{ background:#3b82f6; }
+.reject-btn{ background:#ef4444; }
+.empty-text{ text-align:center; padding:30px; color:#94a3b8; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">Campus<span>Gear</span></div>
+  <div class="admin-info">
+    <span class="admin-name" id="admin-name">Admin</span>
+    <button class="btn back-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button class="btn logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="info-box">
+    <h2>Panel Persetujuan Peminjaman</h2>
+    <p>Admin dapat menyetujui, menolak, dan memvalidasi pengembalian barang kampus.</p>
+  </div>
+  <div class="title">
+    <h1>Admin Panel</h1>
+    <p>Kelola peminjaman barang kampus</p>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('semua', this)">Semua</button>
+    <button class="filter-btn" onclick="setFilter('menunggu', this)">⏳ Menunggu</button>
+    <button class="filter-btn" onclick="setFilter('disetujui', this)">✅ Disetujui</button>
+    <button class="filter-btn" onclick="setFilter('ditolak', this)">❌ Ditolak</button>
+    <button class="filter-btn" onclick="setFilter('dikembalikan', this)">🔄 Dikembalikan</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>NPM / NIDN</th>
+          <th>Barang</th>
+          <th>Kelas</th>
+          <th>Tgl Peminjaman</th>
+          <th>Waktu Peminjaman</th>
+          <th>Tgl Kembali</th>
+          <th>Waktu Kembali</th>
+          <th>Keperluan</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="peminjaman-list"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+const user  = JSON.parse(localStorage.getItem('user'));
+
+if (!user || !token) {
+  alert('Silakan login terlebih dahulu');
+  window.location.href = 'index.html';
+}
+
+if (user.role !== 'admin' && user.role !== 'dosen') {
+  alert('Akses ditolak');
+  window.location.href = 'dashboard.html';
+}
+
+document.getElementById('admin-name').textContent = user.nama;
+
+let allData = [];
+let filterStatus = 'semua';
+
+function formatTanggal(tgl) {
+  if (!tgl) return '-';
+  return tgl.split('T')[0];
+}
+
+async function loadPeminjaman() {
+  try {
+    const response = await fetch('https://campusgear-production.up.railway.app/peminjaman/semua', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (response.status === 401) { logout(); return; }
+    const result = await response.json();
+    allData = result.data || [];
+    renderTable();
+  } catch(error) {
+    console.log(error);
+    alert('Gagal mengambil data');
+  }
+}
+
+function setFilter(status, btn) {
+  filterStatus = status;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const list = document.getElementById('peminjaman-list');
+  const filtered = filterStatus === 'semua' ? allData : allData.filter(i => i.status === filterStatus);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<tr><td colspan="11" class="empty-text">Tidak ada data</td></tr>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  filtered.forEach(item => {
+    console.log(item);
+    list.innerHTML += `
+      <tr>
+        <td>${item.nama      || '-'}</td>
+        <td>${item.npm       || '-'}</td>
+        <td>${item.barang    || '-'}</td>
+        <td>${item.kelas     || '-'}</td>
+        <td>${formatTanggal(item.tgl_pinjam)}</td>
+        <td>${item.waktu_pinjam  || '-'}</td>
+        <td>${formatTanggal(item.tgl_kembali)}</td>
+        <td>${item.waktu_kembali || '-'}</td>
+        <td>${item.keperluan || '-'}</td>
+        <td><span class="status ${item.status}">${item.status}</span></td>
+        <td>
+          ${item.status === 'menunggu' ? `
+            <button class="action-btn approve-btn" onclick="setujui(${item.id})">✅ Setujui</button>
+            <button class="action-btn reject-btn" onclick="tolak(${item.id})">❌ Tolak</button>
+          ` : ''}
+          ${item.status === 'disetujui' ? `
+            <button class="action-btn return-btn" onclick="kembalikan(${item.id})">🔄 Kembalikan</button>
+          ` : ''}
+          ${item.status === 'ditolak' || item.status === 'dikembalikan' ? '<span style="color:#475569">—</span>' : ''}
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function setujui(id) {
+  if (!confirm('Setujui peminjaman ini?')) return;
+  const res = await fetch(`https://campusgear-production.up.railway.app/peminjaman/setujui/${id}`, {
+    method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+  });
+  const result = await res.json();
+  alert(result.message);
+  loadPeminjaman();
+}
+
+async function tolak(id) {
+  if (!confirm('Tolak peminjaman ini?')) return;
+  const res = await fetch(`https://campusgear-production.up.railway.app/peminjaman/tolak/${id}`, {
+    method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+  });
+  const result = await res.json();
+  alert(result.message);
+  loadPeminjaman();
+}
+
+async function kembalikan(id) {
+  if (!confirm('Konfirmasi barang sudah dikembalikan?')) return;
+  const res = await fetch(`https://campusgear-production.up.railway.app/peminjaman/kembalikan/${id}`, {
+    method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+  });
+  const result = await res.json();
+  alert(result.message);
+  loadPeminjaman();
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = 'index.html';
+}
+
+loadPeminjaman();
+</script>
+</body>
+</html>
