@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusGear</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top left, #2563eb 0%, transparent 30%),
+        radial-gradient(circle at bottom right, #7c3aed 0%, transparent 30%),
+        #020617;
+      color:white;
+      overflow-x:hidden;
+    }
+
+    .navbar{
+      width:100%; padding:25px 8%;
+      display:flex; justify-content:space-between; align-items:center;
+      position:fixed; top:0; z-index:100;
+      backdrop-filter:blur(15px);
+      background:rgba(15,23,42,0.4);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .logo{ font-size:28px; font-weight:700; color:#fff; }
+    .logo span{ color:#3b82f6; }
+    .nav-links{ display:flex; gap:30px; }
+    .nav-links a{ color:#cbd5e1; text-decoration:none; transition:0.3s; font-size:15px; }
+    .nav-links a:hover{ color:#fff; }
+
+    .hero{
+      width:100%; min-height:100vh;
+      display:flex; justify-content:center; align-items:center;
+      padding:120px 8% 80px; gap:60px;
+    }
+    .hero-text{ flex:1; }
+    .hero-text h1{ font-size:58px; line-height:1.15; margin-bottom:20px; }
+    .hero-text h1 span{ color:#3b82f6; }
+    .hero-text p{ color:#cbd5e1; line-height:1.8; max-width:550px; font-size:15px; }
+
+    .login-card{
+      width:420px; padding:40px; border-radius:28px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      backdrop-filter:blur(20px);
+      box-shadow:0 15px 40px rgba(0,0,0,0.4);
+      flex-shrink:0;
+    }
+    .login-card h2{ font-size:28px; margin-bottom:8px; }
+    .login-card > p{ color:#cbd5e1; margin-bottom:28px; font-size:14px; }
+
+    .input-group{ margin-bottom:18px; }
+    .input-group label{ display:block; margin-bottom:8px; font-size:13px; color:#cbd5e1; }
+    .input-group input{
+      width:100%; padding:14px; outline:none; border-radius:14px;
+      background:rgba(255,255,255,0.08); color:white;
+      border:1px solid rgba(255,255,255,0.08); transition:0.3s;
+      font-family:'Poppins',sans-serif;
+    }
+    .input-group input::placeholder{ color:#64748b; }
+    .input-group input:focus{ border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.2); }
+
+    .login-btn{
+      width:100%; padding:14px; border:none; border-radius:14px;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      color:white; font-size:15px; font-family:'Poppins',sans-serif;
+      font-weight:600; cursor:pointer; transition:0.3s; margin-top:8px;
+    }
+    .login-btn:hover{ transform:translateY(-2px); opacity:0.9; }
+
+    .bottom-text{ text-align:center; margin-top:18px; font-size:13px; color:#cbd5e1; }
+    .bottom-text a{ color:#3b82f6; text-decoration:none; }
+
+    .features{ width:100%; padding:80px 8%; }
+    .section-title{ text-align:center; margin-bottom:50px; }
+    .section-title h2{ font-size:38px; margin-bottom:10px; }
+    .section-title p{ color:#94a3b8; font-size:15px; }
+
+    .feature-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:22px;
+    }
+    .feature-card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:28px; border-radius:22px; transition:0.3s;
+    }
+    .feature-card:hover{ transform:translateY(-6px); border-color:#3b82f6; }
+    .feature-card h3{ margin:14px 0 8px; font-size:16px; }
+    .feature-card p{ color:#94a3b8; font-size:13px; line-height:1.7; }
+    .icon{
+      width:56px; height:56px; border-radius:16px;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      display:flex; justify-content:center; align-items:center;
+      font-size:24px;
+    }
+
+    .contact{ width:100%; padding:80px 8%; }
+    .contact-box{
+      max-width:600px; margin:0 auto;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:24px; padding:40px;
+      display:flex; flex-direction:column; gap:24px;
+    }
+    .contact-item{ display:flex; align-items:flex-start; gap:16px; }
+    .contact-icon{
+      width:44px; height:44px; border-radius:12px; flex-shrink:0;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      display:flex; justify-content:center; align-items:center;
+      font-size:20px;
+    }
+    .contact-item h3{ font-size:13px; color:#64748b; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .contact-item p{ font-size:15px; color:white; }
+
+    footer{
+      text-align:center; padding:30px; color:#475569;
+      border-top:1px solid rgba(255,255,255,0.06); margin-top:20px;
+      font-size:14px;
+    }
+
+    @media(max-width:1000px){
+      .hero{ flex-direction:column; padding:100px 6% 60px; gap:40px; }
+      .hero-text{ text-align:center; }
+      .hero-text h1{ font-size:40px; }
+      .hero-text p{ margin:0 auto; }
+      .login-card{ width:100%; max-width:460px; }
+      .nav-links{ display:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">Campus<span>Gear</span></div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#features">Fitur</a>
+      <a href="#contact">Kontak</a>
+    </div>
+  </nav>
+
+  <section class="hero" id="home">
+    <div class="hero-text">
+      <h1>Sistem <span>Peminjaman</span> Barang Kampus Modern</h1>
+      <p>CampusGear membantu mahasiswa dan dosen mengelola peminjaman barang kampus dengan lebih cepat, aman, dan efisien.</p>
+    </div>
+
+    <div class="login-card">
+      <h2>Login Account</h2>
+      <p>Masuk ke sistem CampusGear untuk mengakses fitur peminjaman barang kampus.</p>
+
+      <div class="input-group">
+        <label>NPM / NIDN</label>
+        <input type="text" id="nomor_identitas" placeholder="Masukkan NPM atau NIDN">
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Masukkan password"
+               onkeydown="if(event.key==='Enter') login()">
+      </div>
+
+      <button class="login-btn" onclick="login()">Login Sekarang</button>
+
+      <div class="bottom-text">
+        Belum punya akun? <a href="register.html">Register</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="section-title">
+      <h2>Fitur Unggulan</h2>
+      <p>CampusGear menghadirkan sistem peminjaman digital yang modern dan efisien.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">📦</div>
+        <h3>Inventory Management</h3>
+        <p>Mengelola stok dan data barang kampus secara otomatis dan terstruktur.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📋</div>
+        <h3>Online Borrowing</h3>
+        <p>Mahasiswa dapat melakukan peminjaman barang secara online kapan saja.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">⚡</div>
+        <h3>Realtime Status</h3>
+        <p>Memantau status peminjaman dan pengembalian barang secara real-time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔒</div>
+        <h3>Secure System</h3>
+        <p>Password terenkripsi menggunakan bcrypt dan JWT Authentication.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="section-title">
+      <h2>Hubungi Kami</h2>
+      <p>Informasi kontak tim CampusGear.</p>
+    </div>
+    <div class="contact-box">
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <div>
+          <h3>Email</h3>
+          <p>info@campusgear.id</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <h3>Telepon</h3>
+          <p>+62 852-1267-5031</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <h3>Alamat</h3>
+          <p>Jl. Kapten Mukhtar Basri No. 3, Kota Medan, Indonesia</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 CampusGear — Sistem Peminjaman Barang Kampus
+  </footer>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const user  = JSON.parse(localStorage.getItem('user'));
+
+    if (token && user) {
+      if (user.role === 'admin' || user.role === 'dosen') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+
+    async function login() {
+      const nomor_identitas = document.getElementById('nomor_identitas').value.trim();
+      const password        = document.getElementById('password').value;
+
+      if (!nomor_identitas || !password) {
+        alert('Isi NPM/NIDN dan password');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nomor_identitas, password })
+        });
+
+        const result = await response.json();
+
+        if (result.message === 'Login berhasil') {
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('user', JSON.stringify(result.user));
+          if (result.user.role === 'admin' || result.user.role === 'dosen') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } else {
+          alert(result.message);
+        }
+      } catch(error) {
+        alert('Backend tidak terhubung');
+        console.log(error);
+      }
+    }
+  </script>
+
+</body>
+</html>
