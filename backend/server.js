@@ -1,3 +1,4 @@
+require('dotenv').config();
 const peminjamanRoutes = require('./routes/peminjaman');
 const barangRoutes = require('./routes/barang');
 const authRoutes = require('./routes/auth');
